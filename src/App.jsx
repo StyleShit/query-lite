@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
-import {
-	QueryClient,
-	QueryClientProvider,
-	useQuery,
-} from '@tanstack/react-query';
+// import {
+// 	QueryClient,
+// 	QueryClientProvider,
+// 	useQuery,
+// } from '@tanstack/react-query';
 
-// import { QueryClient, QueryClientProvider, useQuery } from './query-lite';
+import { QueryClient, QueryClientProvider, useQuery } from './query-lite';
 
 const queryClient = new QueryClient();
 
