@@ -1,3 +1,4 @@
+import { getPost, getPosts } from './posts';
 import { useState } from 'react';
 
 // import {
@@ -32,14 +33,8 @@ function App() {
 function usePosts() {
 	return useQuery({
 		queryKey: ['posts'],
-		queryFn: async () => {
-			const data = await fetch(
-				'https://jsonplaceholder.typicode.com/posts',
-			).then((res) => res.json());
-
-			await sleep(1000);
-
-			return data.slice(0, 5);
+		queryFn: () => {
+			return getPosts();
 		},
 	});
 }
@@ -47,14 +42,8 @@ function usePosts() {
 function usePost(id) {
 	return useQuery({
 		queryKey: ['posts', id],
-		queryFn: async () => {
-			const data = fetch(
-				`https://jsonplaceholder.typicode.com/posts/${id}`,
-			).then((res) => res.json());
-
-			await sleep(1000);
-
-			return data;
+		queryFn: () => {
+			return getPost(id);
 		},
 
 		staleTime: 10000,
@@ -102,10 +91,6 @@ function Post({ id }) {
 			{isFetching && <BackgroundFetching />}
 		</div>
 	);
-}
-
-function sleep(ms) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function Loading() {
