@@ -41,9 +41,6 @@ function usePosts() {
 
 			return data.slice(0, 5);
 		},
-
-		staleTime: 5000,
-		gcTime: 7000,
 	});
 }
 
@@ -60,8 +57,8 @@ function usePost(id) {
 			return data;
 		},
 
-		staleTime: 5000,
-		gcTime: 7000,
+		staleTime: 10000,
+		gcTime: 20000,
 	});
 }
 
