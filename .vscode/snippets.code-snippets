@@ -1,0 +1,161 @@
+{
+	"r01-create-query": {
+		"prefix": "r01-create-query",
+		"body": [
+			"function createQuery() {",
+			"\tlet state = {",
+			"\t\tstatus: 'pending',",
+			"\t\tisFetching: false,",
+			"\t\tdata: null,",
+			"\t\terror: null,",
+			"\t};",
+			"",
+			"\tconst setState = (setter) => {",
+			"\t\tstate = setter(state);",
+			"\t};",
+			"",
+			"\tconst getState = () => state;",
+			"",
+			"\tconst fetchData = async () => {};",
+			"",
+			"\treturn {",
+			"\t\tgetState,",
+			"\t};",
+			"}"
+		]
+	},
+
+	"r02-fetch": {
+		"prefix": "r02-fetch",
+		"body": [
+			"setState((prev) => ({",
+			"\t...prev,",
+			"\tisFetching: true,",
+			"}));",
+			"",
+			"try {",
+			"\tconst data = await queryFn();",
+			"",
+			"\tsetState((prev) => ({",
+			"\t\t...prev,",
+			"\t\tdata,",
+			"\t\terror: null,",
+			"\t\tstatus: 'success',",
+			"\t}));",
+			"} catch (e) {",
+			"\tsetState((prev) => ({",
+			"\t\t...prev,",
+			"\t\terror: e,",
+			"\t\tstatus: 'error',",
+			"\t}));",
+			"}",
+			"",
+			"setState((prev) => ({ ...prev, isFetching: false }));"
+		]
+	},
+
+	"r03-subscribe": {
+		"prefix": "r03-subscribe",
+		"body": [
+			"const subscribers = new Set();",
+			"",
+			"const subscribe = (cb) => {",
+			"\tsubscribers.add(cb);",
+			"",
+			"\treturn () => {",
+			"\t\tsubscribers.delete(cb);",
+			"\t};",
+			"};"
+		]
+	},
+
+	"r04-get-query": {
+		"prefix": "r04-get-query",
+		"body": [
+			"queries = new Map();",
+			"",
+			"getQuery(options) {",
+			"\tconst queryHash = JSON.stringify(options.queryKey);",
+			"",
+			"\tif (!this.queries.has(queryHash)) {",
+			"\t\tthis.queries.set(queryHash, createQuery(options));",
+			"\t}",
+			"",
+			"\treturn this.queries.get(queryHash);",
+			"}"
+		]
+	},
+
+	"r05-use-query": {
+		"prefix": "r05-use-query",
+		"body": [
+			"const queryClient = useQueryClient();",
+			"const query = queryClient.getQuery(options);",
+			"",
+			"const [state, setState] = useState(() => query.getState());",
+			"",
+			"useEffect(() => {",
+			"\tconst unsubscribe = query.subscribe(() => {",
+			"\t\tsetState(query.getState());",
+			"\t});",
+			"",
+			"\treturn unsubscribe;",
+			"}, [query]);",
+			"",
+			"return state;"
+		]
+	},
+
+	"r06-use-SES": {
+		"prefix": "r06-use-SES",
+		"body": [
+			"return useSyncExternalStore(query.subscribe, query.getState);"
+		]
+	},
+
+	"r07-is-stale": {
+		"prefix": "r07-is-stale",
+		"body": [
+			"if (staleTime && Date.now() - state.lastUpdated < staleTime) {",
+			"\treturn;",
+			"}"
+		]
+	},
+
+	"r08-schedule-gc": {
+		"prefix": "r08-schedule-gc",
+		"body": [
+			"let gcTimeout;",
+			"",
+			"const scheduleGC = () => {",
+			"\tif (!gcTime) {",
+			"\t\treturn;",
+			"\t}",
+			"",
+			"\tgcTimeout = setTimeout(() => {",
+			"\t\tclient.deleteQuery(queryKey);",
+			"\t}, gcTime);",
+			"};"
+		]
+	},
+
+	"r09-delete-query": {
+		"prefix": "r09-delete-query",
+		"body": [
+			"deleteQuery(queryKey) {",
+			"\tconst queryHash = JSON.stringify(queryKey);",
+			"",
+			"\tthis.queries.delete(queryHash);",
+			"}"
+		]
+	},
+
+	"r10-unschedule-gc": {
+		"prefix": "r10-unschedule-gc",
+		"body": [
+			"const unscheduleGC = () => {",
+			"\tclearTimeout(gcTimeout);",
+			"};"
+		]
+	}
+}
