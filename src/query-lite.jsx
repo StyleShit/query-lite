@@ -32,97 +32,95 @@ export class QueryClient {
 	}
 }
 
-function createQuery(
-	client,
-	{ queryKey, queryFn, staleTime = 0, gcTime = 10000 },
-) {
-	const query = {
-		state: {
-			status: 'pending',
-			isFetching: false,
-			data: null,
-			error: null,
-		},
-
-		subscribers: new Set(),
-
-		setState(setter) {
-			query.state = setter(query.state);
-
-			query.subscribers.forEach((cb) => cb());
-		},
-
-		getState() {
-			return query.state;
-		},
-
-		async fetch() {
-			if (query.state.isFetching) {
-				return;
-			}
-
-			if (staleTime && Date.now() - query.state.lastUpdated < staleTime) {
-				return;
-			}
-
-			query.setState((prev) => ({
-				...prev,
-				isFetching: true,
-			}));
-
-			try {
-				const data = await queryFn();
-
-				query.setState((prev) => ({
-					...prev,
-					data,
-					error: null,
-					status: 'success',
-					lastUpdated: Date.now(),
-				}));
-			} catch (e) {
-				query.setState((prev) => ({
-					...prev,
-					error: e,
-					status: 'error',
-				}));
-			} finally {
-				query.setState((prev) => ({ ...prev, isFetching: false }));
-			}
-		},
-
-		subscribe(cb) {
-			query.unscheduleGC();
-
-			query.subscribers.add(cb);
-
-			query.fetch();
-
-			return () => {
-				query.subscribers.delete(cb);
-
-				if (query.subscribers.size === 0) {
-					query.scheduleGC();
-				}
-			};
-		},
-
-		scheduleGC() {
-			if (!gcTime) {
-				return;
-			}
-
-			query.gcTimeout = setTimeout(() => {
-				client.deleteQuery(queryKey);
-			}, gcTime);
-		},
-
-		unscheduleGC() {
-			clearTimeout(query.gcTimeout);
-		},
+function createQuery(client, { queryKey, queryFn, staleTime, gcTime }) {
+	let state = {
+		status: 'pending',
+		isFetching: false,
+		data: null,
+		error: null,
 	};
 
-	return query;
+	const setState = (setter) => {
+		state = setter(state);
+
+		subscribers.forEach((cb) => cb());
+	};
+
+	const getState = () => state;
+
+	const fetchData = async () => {
+		if (state.isFetching) {
+			return;
+		}
+
+		if (staleTime && Date.now() - state.lastUpdated < staleTime) {
+			return;
+		}
+
+		setState((prev) => ({
+			...prev,
+			isFetching: true,
+		}));
+
+		try {
+			const data = await queryFn();
+
+			setState((prev) => ({
+				...prev,
+				data,
+				error: null,
+				status: 'success',
+				lastUpdated: Date.now(),
+			}));
+		} catch (e) {
+			setState((prev) => ({
+				...prev,
+				error: e,
+				status: 'error',
+			}));
+		}
+
+		setState((prev) => ({ ...prev, isFetching: false }));
+	};
+
+	const subscribers = new Set();
+
+	const subscribe = (cb) => {
+		unscheduleGC();
+
+		subscribers.add(cb);
+
+		fetchData();
+
+		return () => {
+			subscribers.delete(cb);
+
+			if (subscribers.size === 0) {
+				scheduleGC();
+			}
+		};
+	};
+
+	let gcTimeout;
+
+	const scheduleGC = () => {
+		if (!gcTime) {
+			return;
+		}
+
+		gcTimeout = setTimeout(() => {
+			client.deleteQuery(queryKey);
+		}, gcTime);
+	};
+
+	const unscheduleGC = () => {
+		clearTimeout(gcTimeout);
+	};
+
+	return {
+		getState,
+		subscribe,
+	};
 }
 
 export function useQuery(options) {
