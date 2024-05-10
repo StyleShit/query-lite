@@ -46,8 +46,8 @@ function usePost(id) {
 			return getPost(id);
 		},
 
-		staleTime: 10000,
-		gcTime: 20000,
+		// staleTime: 10000,
+		// gcTime: 20000,
 	});
 }
 
