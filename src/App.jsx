@@ -1,5 +1,6 @@
 import { getPost, getPosts } from './posts';
 import { useState } from 'react';
+import { BackgroundFetching, Loading } from './loaders';
 
 // import {
 // 	QueryClient,
@@ -91,14 +92,6 @@ function Post({ id }) {
 			{isFetching && <BackgroundFetching />}
 		</div>
 	);
-}
-
-function Loading() {
-	return <span className="loading">Loading...</span>;
-}
-
-function BackgroundFetching() {
-	return <span className="background-fetch">Background Fetching...</span>;
 }
 
 export default App;
