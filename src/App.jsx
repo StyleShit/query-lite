@@ -19,13 +19,13 @@ function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<div className="App">
-				{postId ? (
+				{postId === null ? (
+					<Posts onClick={setPostId} />
+				) : (
 					<>
 						<button onClick={() => setPostId(null)}>Back</button>
 						<Post id={postId} />
 					</>
-				) : (
-					<Posts onClick={setPostId} />
 				)}
 			</div>
 		</QueryClientProvider>
