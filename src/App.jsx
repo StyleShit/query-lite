@@ -1,5 +1,6 @@
-import { getPost, getPosts } from './posts';
 import { useState } from 'react';
+import { Timer } from './timer';
+import { BackgroundFetching, Loading } from './loaders';
 
 import {
 	QueryClient,
@@ -17,13 +18,13 @@ function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<div className="App">
-				{postId ? (
+				{postId === null ? (
+					<Posts onClick={setPostId} />
+				) : (
 					<>
 						<button onClick={() => setPostId(null)}>Back</button>
 						<Post id={postId} />
 					</>
-				) : (
-					<Posts onClick={setPostId} />
 				)}
 			</div>
 		</QueryClientProvider>
@@ -34,7 +35,7 @@ function usePosts() {
 	return useQuery({
 		queryKey: ['posts'],
 		queryFn: () => {
-			return getPosts();
+			return fetch('/posts').then((res) => res.json());
 		},
 	});
 }
@@ -43,11 +44,11 @@ function usePost(id) {
 	return useQuery({
 		queryKey: ['posts', id],
 		queryFn: () => {
-			return getPost(id);
+			return fetch(`/posts/${id}`).then((res) => res.json());
 		},
 
 		// staleTime: 10000,
-		// gcTime: 20000,
+		// gcTime: 15000,
 	});
 }
 
@@ -56,7 +57,11 @@ function Posts({ onClick }) {
 
 	return (
 		<>
-			<h1>Posts</h1>
+			<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+				<h1>Posts</h1>
+				<Timer />
+			</div>
+
 			{status === 'pending' ? (
 				<Loading />
 			) : (
@@ -91,14 +96,6 @@ function Post({ id }) {
 			{isFetching && <BackgroundFetching />}
 		</div>
 	);
-}
-
-function Loading() {
-	return <span className="loading">Loading...</span>;
-}
-
-function BackgroundFetching() {
-	return <span className="background-fetch">Background Fetching...</span>;
 }
 
 export default App;

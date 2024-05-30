@@ -1,4 +1,4 @@
-const posts = {
+export const posts = {
 	1: {
 		id: 1,
 		title: 'How to use React Query',
@@ -34,20 +34,4 @@ const posts = {
 		title: 'Did you read so far? I am impressed!',
 		body: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit quia et suscipit suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto',
 	},
-};
-
-export const getPosts = async () => {
-	await sleep(1000);
-
-	return Object.values(posts);
-};
-
-export const getPost = async (id) => {
-	await sleep(1000);
-
-	return posts[id];
-};
-
-const sleep = (ms) => {
-	return new Promise((resolve) => setTimeout(resolve, ms));
 };
