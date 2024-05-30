@@ -1,4 +1,3 @@
-import { getPost, getPosts } from './posts';
 import { useState } from 'react';
 import { Timer } from './timer';
 import { BackgroundFetching, Loading } from './loaders';
@@ -36,7 +35,7 @@ function usePosts() {
 	return useQuery({
 		queryKey: ['posts'],
 		queryFn: () => {
-			return getPosts();
+			return fetch('/posts').then((res) => res.json());
 		},
 	});
 }
@@ -45,7 +44,7 @@ function usePost(id) {
 	return useQuery({
 		queryKey: ['posts', id],
 		queryFn: () => {
-			return getPost(id);
+			return fetch(`/posts/${id}`).then((res) => res.json());
 		},
 
 		staleTime: 10000,
