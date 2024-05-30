@@ -1,5 +1,6 @@
 import { getPost, getPosts } from './posts';
 import { useState } from 'react';
+import { Timer } from './timer';
 import { BackgroundFetching, Loading } from './loaders';
 
 // import {
@@ -57,7 +58,11 @@ function Posts({ onClick }) {
 
 	return (
 		<>
-			<h1>Posts</h1>
+			<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+				<h1>Posts</h1>
+				<Timer />
+			</div>
+
 			{status === 'pending' ? (
 				<Loading />
 			) : (
