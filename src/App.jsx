@@ -49,7 +49,7 @@ function usePost(id) {
 		},
 
 		staleTime: 10000,
-		gcTime: 20000,
+		gcTime: 15000,
 	});
 }
 

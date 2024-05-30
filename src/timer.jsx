@@ -28,7 +28,7 @@ function getColor(seconds) {
 		return '#000';
 	}
 
-	if (seconds < 20) {
+	if (seconds < 15) {
 		return 'green';
 	}
 
