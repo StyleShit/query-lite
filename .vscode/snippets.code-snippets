@@ -69,28 +69,10 @@
 		]
 	},
 
-	"r04-get-query": {
-		"prefix": "r04-get-query",
+	"r04-use-query": {
+		"prefix": "r04-use-query",
 		"body": [
-			"queries = new Map();",
-			"",
-			"getQuery(options) {",
-			"\tconst queryHash = JSON.stringify(options.queryKey);",
-			"",
-			"\tif (!this.queries.has(queryHash)) {",
-			"\t\tthis.queries.set(queryHash, createQuery(options));",
-			"\t}",
-			"",
-			"\treturn this.queries.get(queryHash);",
-			"}"
-		]
-	},
-
-	"r05-use-query": {
-		"prefix": "r05-use-query",
-		"body": [
-			"const queryClient = useQueryClient();",
-			"const query = queryClient.getQuery(options);",
+			"const [query] = useState(() => createQuery(options));",
 			"",
 			"const [state, setState] = useState(() => query.getState());",
 			"",
@@ -106,10 +88,28 @@
 		]
 	},
 
-	"r06-use-SES": {
-		"prefix": "r06-use-SES",
+	"r05-get-query": {
+		"prefix": "r05-get-query",
 		"body": [
-			"return useSyncExternalStore(query.subscribe, query.getState);"
+			"queries = new Map();",
+			"",
+			"getQuery(options) {",
+			"\tconst queryHash = JSON.stringify(options.queryKey);",
+			"",
+			"\tif (!this.queries.has(queryHash)) {",
+			"\t\tthis.queries.set(queryHash, createQuery(options));",
+			"\t}",
+			"",
+			"\treturn this.queries.get(queryHash);",
+			"}"
+		]
+	},
+
+	"r06-use-query": {
+		"prefix": "r06-use-query",
+		"body": [
+			"const queryClient = useQueryClient();",
+			"const query = queryClient.getQuery(options);"
 		]
 	},
 
@@ -156,6 +156,13 @@
 			"const unscheduleGC = () => {",
 			"\tclearTimeout(gcTimeout);",
 			"};"
+		]
+	},
+
+	"r11-use-SES": {
+		"prefix": "r11-use-SES",
+		"body": [
+			"return useSyncExternalStore(query.subscribe, query.getState);"
 		]
 	}
 }
