@@ -21,10 +21,7 @@ function App() {
 				{postId === null ? (
 					<Posts onClick={setPostId} />
 				) : (
-					<>
-						<button onClick={() => setPostId(null)}>Back</button>
-						<Post id={postId} />
-					</>
+					<Post id={postId} goBack={() => setPostId(null)} />
 				)}
 			</div>
 		</QueryClientProvider>
@@ -57,44 +54,51 @@ function Posts({ onClick }) {
 
 	return (
 		<>
-			<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+			<div className="title-wrapper">
 				<h1>Posts</h1>
+
+				{status !== 'pending' && isFetching && <BackgroundFetching />}
+
 				<Timer />
 			</div>
 
 			{status === 'pending' ? (
 				<Loading />
 			) : (
-				<>
-					<ul>
-						{data.map((post) => (
-							<li key={post.id}>
-								<a href="#" onClick={() => onClick(post.id)}>
-									{post.title}
-								</a>
-							</li>
-						))}
-					</ul>
-					{isFetching && <BackgroundFetching />}
-				</>
+				<ul>
+					{data.map((post) => (
+						<li key={post.id}>
+							<a href="#" onClick={() => onClick(post.id)}>
+								{post.title}
+							</a>
+						</li>
+					))}
+				</ul>
 			)}
 		</>
 	);
 }
 
-function Post({ id }) {
+function Post({ id, goBack }) {
 	const { data, status, isFetching } = usePost(id);
 
-	if (status === 'pending') {
-		return <Loading />;
-	}
-
 	return (
-		<div>
-			<h2>{data.title}</h2>
-			<p>{data.body}</p>
-			{isFetching && <BackgroundFetching />}
-		</div>
+		<>
+			<div className="title-wrapper">
+				<button onClick={goBack}>Back</button>
+
+				{status !== 'pending' && isFetching && <BackgroundFetching />}
+			</div>
+
+			{status === 'pending' ? (
+				<Loading />
+			) : (
+				<div>
+					<h2>{data.title}</h2>
+					<p>{data.body}</p>
+				</div>
+			)}
+		</>
 	);
 }
 
